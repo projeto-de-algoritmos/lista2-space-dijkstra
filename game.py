@@ -15,41 +15,48 @@ screen.blit(ship, (ship_left, ship_top))
 background = pygame.image.load('images/background.jpg')
 shot = pygame.image.load('images/laser.png')
 
+class Shot:
+    def __init__(self):
+        self.image = shot
+        self.pos_x = 0
+        self.pos_y = 500
 
 class Game:
     def __init__(self):
-        self.pos_x = screen.get_width()/2
+        self.pos_x = screen.get_width()/2 # ship horizontal position
 
     def run(self):
         shoot_y = 0
+        shot_list = []
         while True:
             clock.tick(60)
-            screen.fill((0, 0, 0))
+            # screen.fill((0, 0, 0))
             screen.blit(background, [0, 0])
             screen.blit(ship, (self.pos_x-ship.get_width()/2, ship_top))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                elif event.type == MOUSEBUTTONDOWN:
-                    shoot_y = 500
-                    shoot_x = self.pos_x
+                elif event.type == KEYDOWN and event.key == 32:
+                    ship_shot = Shot()
+                    ship_shot.pos_x = self.pos_x
+                    shot_list.append(ship_shot)
 
             key = pygame.key.get_pressed()
             self.keyboard_manager(key)
-            
-            if shoot_y > 0:
-                screen.blit(shot, (shoot_x, shoot_y))
-                shoot_y -= 10
+
+            for i in shot_list:
+                screen.blit(i.image, (i.pos_x,i.pos_y))
+                i.pos_y -= 10
 
             pygame.display.update()
     
     def keyboard_manager(self, key):
         if key[pygame.K_ESCAPE]:
             sys.exit()
-        elif key[pygame.K_LEFT]:
-            self.pos_x -= 3
-        elif key[pygame.K_RIGHT]:
-            self.pos_x += 3
+        elif key[pygame.K_LEFT] and self.pos_x >= ship.get_width()/2:
+            self.pos_x -= 10
+        elif key[pygame.K_RIGHT] and self.pos_x <= screen.get_width()-ship.get_width()/2:
+            self.pos_x += 10
 
 if __name__ == '__main__':
     game = Game()
