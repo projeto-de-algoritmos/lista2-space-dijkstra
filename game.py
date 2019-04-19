@@ -66,8 +66,11 @@ class Map:
         self.pos_y_end = pos_y_end
         self.coust = randint(1, 11)
         if(pos_x_ini == 1060 and pos_y_ini == 0):
-            self.coust = 'x'
+            self.coust = 'x' # posicao final
+        if(pos_x_ini == 0 and pos_y_ini == 588):
+            self.coust = 0 # posicao inicial
         self.has_ipiranga = randint(0, 2)
+        self.neighbors = []
 
     def add_node(self, value):
         self.nodes.add(value)
@@ -79,6 +82,23 @@ class Map:
 
     def __str__(self):
         return str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.coust) + " " + str(self.has_ipiranga)
+
+
+def create_edges(map):
+    for i in map:
+        up = [x for x in map if(x.pos_y_end == i.pos_y_ini-1 and x.pos_x_ini == i.pos_x_ini )]
+        down = [x for x in map if(x.pos_y_end == i.pos_y_end+1 and x.pos_x_ini == i.pos_x_ini )]
+        right = [x for x in map if(x.pos_y_end == i.pos_x_end+1 and x.pos_y_ini == i.pos_y_ini )]
+        left = [x for x in map if(x.pos_y_end == i.pos_x_ini-1 and x.pos_y_ini == i.pos_y_ini )]
+
+        if(up):
+            i.neighbors.append(up[0])
+        if(down):
+            i.neighbors.append(down[0])
+        if(right):
+            i.neighbors.append(right[0])
+        if(left):
+            i.neighbors.append(left[0])
 
 
 def create_map():
@@ -99,12 +119,12 @@ def text_objects(text, font):
 class Game:
     def __init__(self):
         self.map = create_map()
-        for i in self.map:
-            print(i)
+        create_edges(self.map)
         self.pos_x = 100 # screen.get_width()/2 # ship horizontal position
         self.pos_y = ship_top
         self.combustivel = 50
         self.onde_eu_to = None
+        self.ativar_postos = False
 
     def run(self):
         shot_list = deque([])
@@ -157,6 +177,9 @@ class Game:
             self.pos_y -= 10
         elif key[pygame.K_DOWN] and self.pos_y <= screen.get_height()-ship.get_height():
             self.pos_y += 10
+        elif key[pygame.K_0]:
+            self.ativar_postos = True
+
     
     def draw_cousts(self):
         largeText = pygame.font.Font('freesansbold.ttf',25)
@@ -164,7 +187,7 @@ class Game:
         TextRect.center = ((30),(28))
         gameDisplay.blit(TextSurf, TextRect)
         for i in self.map:
-            if(i.has_ipiranga == 1):
+            if(self.ativar_postos and i.has_ipiranga == 1):
                 screen.blit(posto, ((i.pos_x_ini),(i.pos_y_ini)))
             TextSurf, TextRect = text_objects(str(i.coust), largeText)
             TextRect.center = ((i.pos_x_ini+105),(i.pos_y_ini+48))
@@ -180,6 +203,9 @@ class Game:
                 print('funciona msm ' + str(i.coust))
                 self.onde_eu_to = i
                 self.combustivel -= i.coust
+                if(self.ativar_postos and i.has_ipiranga == 1):
+                    i.has_ipiranga = 0
+                    self.combustivel += 5
             
 
 
