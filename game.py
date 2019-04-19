@@ -25,6 +25,8 @@ ship_left = screen.get_width()/2 - ship.get_width()/2
 
 screen.blit(ship, (ship_left, ship_top))
 
+posto = pygame.image.load('images/mystery.png')
+portal = pygame.image.load('images/enemy2_1.png')
 background = pygame.image.load('images/space.jpg')
 shot = pygame.image.load('images/laser.png')
 # node_1 = pygame.image.load('images/number1.png')
@@ -63,7 +65,9 @@ class Map:
         self.pos_y_ini = pos_y_ini
         self.pos_y_end = pos_y_end
         self.coust = randint(1, 11)
-        self.has_ipiranga = randint(0, 1)
+        if(pos_x_ini == 1060 and pos_y_ini == 0):
+            self.coust = 'x'
+        self.has_ipiranga = randint(0, 2)
 
     def add_node(self, value):
         self.nodes.add(value)
@@ -97,9 +101,10 @@ class Game:
         self.map = create_map()
         for i in self.map:
             print(i)
-        self.pos_x = screen.get_width()/2 # ship horizontal position
+        self.pos_x = 100 # screen.get_width()/2 # ship horizontal position
         self.pos_y = ship_top
-        # self.scoreText = Text(FONT, 20, 'Score', WHITE, 5, 5)
+        self.combustivel = 50
+        self.onde_eu_to = None
 
     def run(self):
         shot_list = deque([])
@@ -114,7 +119,10 @@ class Game:
             # self.scoreText.draw(screen)
             screen.blit(ship, (self.pos_x-ship.get_width()/2, self.pos_y))
 
+            # screen.blit(portal, (900, 25))
+
             self.draw_cousts()
+            self.check_colisor()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -151,11 +159,28 @@ class Game:
             self.pos_y += 10
     
     def draw_cousts(self):
+        largeText = pygame.font.Font('freesansbold.ttf',25)
+        TextSurf, TextRect = text_objects(str(self.combustivel), largeText)
+        TextRect.center = ((30),(28))
+        gameDisplay.blit(TextSurf, TextRect)
         for i in self.map:
-            largeText = pygame.font.Font('freesansbold.ttf',25)
+            if(i.has_ipiranga == 1):
+                screen.blit(posto, ((i.pos_x_ini),(i.pos_y_ini)))
             TextSurf, TextRect = text_objects(str(i.coust), largeText)
             TextRect.center = ((i.pos_x_ini+105),(i.pos_y_ini+48))
             gameDisplay.blit(TextSurf, TextRect)
+
+    def check_colisor(self):
+        for i in self.map:
+            if(self.onde_eu_to != i and
+                 self.pos_x >= i.pos_x_ini and 
+                 self.pos_x < i.pos_x_end and 
+                 self.pos_y >= i.pos_y_ini and 
+                 self.pos_y < i.pos_y_end):
+                print('funciona msm ' + str(i.coust))
+                self.onde_eu_to = i
+                self.combustivel -= i.coust
+            
 
 
 if __name__ == '__main__':
