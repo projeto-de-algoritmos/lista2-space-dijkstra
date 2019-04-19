@@ -16,8 +16,8 @@ Você pode tentar se aventurar na viagem e tomar suas próprias escolhas, mas se
 ## Instalação
 
 ```
-git clone https://github.com/projeto-de-algoritmos/lista2-grafos.git
-cd lista2-grafos
+git clone https://github.com/projeto-de-algoritmos/lista2-space-dijkstra.git
+cd lista2-space-dijkstra
 pip3 install -r requirements.txt
 ```
 
