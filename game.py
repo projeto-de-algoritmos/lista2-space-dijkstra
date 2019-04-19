@@ -57,7 +57,6 @@ class Map:
             self.cost = 0 # posicao inicial
         self.has_ipiranga = randint(0, 2)
         self.neighbors = []
-        self.lowest_cost = None
         self.visited = False
 
     def add_node(self, value):
@@ -76,42 +75,47 @@ def dijsktra(graph):
     # id, origin, cost
     nodes_cost = defaultdict(list)
     to_visit = []
-    # nodes_cost['2'].append((1, 2))
 
+    """
+    procura o nó com custo zero, posição inical da nave
+    """
     for i in graph:
         if i.cost == 0:
             first = i
             break
 
     first.visited = True
-    first.lowest_cost = 0
-    # print(graph[0].cost)
-    # print(graph[0].neighbors[0].cost)
-    # print(graph[0].neighbors[1].cost)
     
-    # for i in nodes_cost: print (i)
     for i in first.neighbors:
-        cost = i.cost + first.lowest_cost
-        found = False
-        for j in to_visit:
-            # print('j = ' + str(j) + ' i.id = ' + str(i.id))
-            if i.id == j[2] and cost < j[0]:
-                j = (cost, first.id, i.id)
-                heapq.heapify(to_visit)
-                found = True
+        if i.has_ipiranga == 1:
+            cost = i.cost - 5
+        else:
+            cost = i.cost
+        # found = False
+        # for j in to_visit:
+        #     if i.id == j[2] and cost < j[0]:
+        #         j = (cost, first.id, i.id)
+        #         heapq.heapify(to_visit)
+        #         found = True
         
         # cost, origin, destin
-        if not found:
-            heapq.heappush(to_visit, (cost, first.id, i.id))
+        # if not found:
+        heapq.heappush(to_visit, (cost, first.id, i.id))
 
-    print(to_visit)
-    heapq.heappop(to_visit)
+    
     while to_visit:
+        # count += 1
+        # if count == 200: break
         # print('###')
         to_verify = heapq.heappop(to_visit)
         id = str(to_verify[2])
         origin = to_verify[1]
         cost = to_verify[0]
+
+        # busca o nó que corresponde ao to_verify
+        # id, (origin, cost)
+        node = [x for x in graph if (x.id == to_verify[2])][0]
+        node.visited = True
         
         
         # verifica se existe o peso para chegar no nó e atualiza
@@ -125,6 +129,7 @@ def dijsktra(graph):
         if id == '36':
             caminho = []
 
+            # id, (origin, cost)
             while id != str(first.id):
                 # print(nodes_cost[id])
                 caminho.append((id, nodes_cost[id][0], nodes_cost[id][1]))
@@ -132,7 +137,9 @@ def dijsktra(graph):
                 # print('id 1 = ' + id)
                 id = str(nodes_cost[id][0])
                 # print('id 2 = ' + id)
-            
+            print('###########################')
+            print (id)
+            caminho.reverse()
             print(caminho)
             break
 
@@ -142,31 +149,32 @@ def dijsktra(graph):
 
             # for i in nodes_cost:
             #     print(i)
-            break
+            # break
 
-        # busca o nó que corresponde ao to_verify
-        # id, (origin, cost)
-        node = [x for x in graph if (x.id == to_verify[2])][0]
-        node.visited = True
+        
 
-        if node.id == 36:
-            print(node.cost)
+        # if node.id == 36:
+        #     print(node.cost)
         # print('####')
-        # print(node.id)
-        # print(node.cost)
-        # print(node.lowest_cost)
-        # print(nodes_cost[id][0])
-        # print(nodes_cost[id][1])
-        # print(id)
+        
         node_cost = nodes_cost[id][1]
         for i in node.neighbors:
-            if i.cost == 'x':
-                cost = node_cost
-            else:
-                cost = node_cost + i.cost
+
             if not i.visited:
-                # print('entrous')
+                if i.cost == 'x':
+                    cost = node_cost
+                else:
+                    if i.has_ipiranga == 1:
+                        cost = node_cost + i.cost - 5
+                    else:
+                        cost = node_cost + i.cost
                 heapq.heappush(to_visit, (cost, node.id, i.id))
+
+            # if not i.visited:
+                # print('entrous')
+                # não verifica se já existe no heap
+                # heapq.heappush(to_visit, (cost, node.id, i.id))
+
             
 
     # for i in first.neighbors:
