@@ -84,12 +84,12 @@ class Map:
         return str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.coust) + " " + str(self.has_ipiranga)
 
 
-def create_edges(map):
-    for i in map:
-        up = [x for x in map if(x.pos_y_end == i.pos_y_ini-1 and x.pos_x_ini == i.pos_x_ini )]
-        down = [x for x in map if(x.pos_y_end == i.pos_y_end+1 and x.pos_x_ini == i.pos_x_ini )]
-        right = [x for x in map if(x.pos_y_end == i.pos_x_end+1 and x.pos_y_ini == i.pos_y_ini )]
-        left = [x for x in map if(x.pos_y_end == i.pos_x_ini-1 and x.pos_y_ini == i.pos_y_ini )]
+def create_edges(mapa):
+    for i in mapa:
+        up = [x for x in mapa if(x.pos_y_end == i.pos_y_ini-1 and x.pos_x_ini == i.pos_x_ini )] # certo
+        down = [x for x in mapa if(x.pos_y_ini == i.pos_y_end+1 and x.pos_x_ini == i.pos_x_ini )]
+        right = [x for x in mapa if(x.pos_x_ini == i.pos_x_end+1 and x.pos_y_ini == i.pos_y_ini )]
+        left = [x for x in mapa if(x.pos_x_end == i.pos_x_ini-1 and x.pos_y_ini == i.pos_y_ini )]
 
         if(up):
             i.neighbors.append(up[0])
@@ -120,11 +120,16 @@ class Game:
     def __init__(self):
         self.map = create_map()
         create_edges(self.map)
+        # for i in self.map:
+        #     print('pai ' + str(i))
+        #     for j in i.neighbors:
+        #         print('filho ' + str(j))
+        #     print()
         self.pos_x = 100 # screen.get_width()/2 # ship horizontal position
         self.pos_y = ship_top
         self.combustivel = 50
         self.onde_eu_to = None
-        self.ativar_postos = False
+        self.ativar_postos = True
 
     def run(self):
         shot_list = deque([])
@@ -132,6 +137,10 @@ class Game:
         # node = Node(5)
 
         while True:
+            if(self.combustivel <= 0):
+                print('YOU LOSE')
+                sys.exit()
+
             clock.tick(60)
             # node.draw_node(self.pos_x, 2*ship_top)
             # screen.fill((0, 0, 0))
@@ -200,7 +209,10 @@ class Game:
                  self.pos_x < i.pos_x_end and 
                  self.pos_y >= i.pos_y_ini and 
                  self.pos_y < i.pos_y_end):
-                print('funciona msm ' + str(i.coust))
+                if(i.coust == 'x'):
+                    print('YOU WIN')
+                    sys.exit()
+                # print('funciona msm ' + str(i.coust))
                 self.onde_eu_to = i
                 self.combustivel -= i.coust
                 if(self.ativar_postos and i.has_ipiranga == 1):
