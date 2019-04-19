@@ -84,6 +84,35 @@ class Map:
         return str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.coust) + " " + str(self.has_ipiranga)
 
 
+def dijsktra(graph, initial):
+  visited = {initial: 0}
+  path = {}
+
+  nodes = set(graph.nodes)
+
+  while nodes: 
+    min_node = None
+    for node in nodes:
+      if node in visited:
+        if min_node is None:
+          min_node = node
+        elif visited[node] < visited[min_node]:
+          min_node = node
+
+    if min_node is None:
+      break
+
+    nodes.remove(min_node)
+    current_weight = visited[min_node]
+
+    for edge in graph.edges[min_node]:
+      weight = current_weight + graph.distance[(min_node, edge)]
+      if edge not in visited or weight < visited[edge]:
+        visited[edge] = weight
+        path[edge] = min_node
+
+  return visited, path
+
 def create_edges(mapa):
     for i in mapa:
         up = [x for x in mapa if(x.pos_y_end == i.pos_y_ini-1 and x.pos_x_ini == i.pos_x_ini )] # certo
