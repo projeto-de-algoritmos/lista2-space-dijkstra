@@ -26,3 +26,11 @@ obs: utilizamos para o desenvolvimento o python 3.5.3
 ```
 python3 game.py
 ```
+
+## O jogo
+
+![image2](images/jogo_normal.gif)
+
+## Utilizando Dijskstra
+
+![image1](images/usando_dijkstra.gif)
