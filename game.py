@@ -15,8 +15,6 @@ white = (255,255,255)
 red = (255,0,0)
 
 gameDisplay = pygame.display.set_mode((1277, 689))
-# solutionDisplay = pygame.display.set_mode((1277, 689))
-
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((1277, 689))
 
@@ -202,18 +200,14 @@ def text_objects(text, font):
 class Game:
     def __init__(self):
         self.map = create_map()
+        self.solution_is_visible = False
         create_edges(self.map)
         self.best_path = dijsktra(self.map)
-        while self.best_path[-1][2] < 45 or self.best_path[-1][2] > 50:
+        while self.best_path[-1][2] < 45 or self.best_path[-1][2] > 49:
             self.map = create_map()
             create_edges(self.map)
             self.best_path = dijsktra(self.map)
         print('the real game = ' + str(self.best_path))
-        # for i in self.map:
-        #     print('pai ' + str(i))
-        #     for j in i.neighbors:
-        #         print('filho ' + str(j))
-        #     print()
         self.pos_x = 100 # screen.get_width()/2 # ship horizontal position
         self.pos_y = ship_top
         self.combustivel = 50
@@ -239,14 +233,19 @@ class Game:
 
             self.draw_costs()
             self.check_colisor()
+            if self.solution_is_visible:
+                self.draw_solution()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                elif event.type == KEYDOWN and event.key == 32:
+                elif event.type == KEYDOWN and event.key == 32: # espace
                     ship_shot = Shot()
                     ship_shot.pos_x = self.pos_x
+                    ship_shot.pos_y = self.pos_y
                     shot_list.append(ship_shot)
+                elif event.type == KEYDOWN and event.key == 115: # key s
+                    self.solution_is_visible = not self.solution_is_visible
 
             key = pygame.key.get_pressed()
             self.keyboard_manager(key)
@@ -266,19 +265,27 @@ class Game:
         if key[pygame.K_ESCAPE]:
             sys.exit()
         elif key[pygame.K_LEFT] and self.pos_x >= ship.get_width()/2:
-            self.pos_x -= 10
+            self.pos_x -= 5
         elif key[pygame.K_RIGHT] and self.pos_x <= screen.get_width()-ship.get_width()/2:
-            self.pos_x += 10
+            self.pos_x += 5
         elif key[pygame.K_UP] and self.pos_y >= ship.get_height()/2:
-            self.pos_y -= 10
+            self.pos_y -= 5
         elif key[pygame.K_DOWN] and self.pos_y <= screen.get_height()-ship.get_height():
-            self.pos_y += 10
+            self.pos_y += 5
         elif key[pygame.K_0]:
             self.ativar_postos = True
 
-    # def draw_solution(self):
-    #     pygame.draw.circle(solutionDisplay)
-    #     pass
+    def draw_solution(self):
+        for i in self.best_path:
+            for j in self.map:
+                if i[1] == j.id:
+                    pygame.draw.circle(
+                        screen, red,
+                        (
+                            int(round((j.pos_x_ini + j.pos_x_end)/2)),
+                            int(round((j.pos_y_ini + j.pos_y_end)/2))
+                        ), 20, 0)
+
 
     def draw_costs(self):
         largeText = pygame.font.Font('freesansbold.ttf',25)
