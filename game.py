@@ -69,7 +69,7 @@ class Map:
         self.distances[(from_node, to_node)] = distance
 
     def __str__(self):
-        return str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.cost) + " " + str(self.has_ipiranga)
+        return 'id = ' + str(self.id) + ' ' + str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.cost) + " " + str(self.has_ipiranga)
 
 
 def dijsktra(graph):
@@ -78,7 +78,11 @@ def dijsktra(graph):
     to_visit = []
     # nodes_cost['2'].append((1, 2))
 
-    first = graph[0]
+    for i in graph:
+        if i.cost == 0:
+            first = i
+            break
+
     first.visited = True
     first.lowest_cost = 0
     # print(graph[0].cost)
@@ -101,12 +105,14 @@ def dijsktra(graph):
             heapq.heappush(to_visit, (cost, first.id, i.id))
 
     print(to_visit)
-    while not to_visit: # preso no loop
-        print('###')
+    heapq.heappop(to_visit)
+    while to_visit:
+        # print('###')
         to_verify = heapq.heappop(to_visit)
         id = str(to_verify[2])
         origin = to_verify[1]
         cost = to_verify[0]
+        
         
         # verifica se existe o peso para chegar no nó e atualiza
         if nodes_cost[id]:
@@ -116,20 +122,51 @@ def dijsktra(graph):
             nodes_cost[id] = (origin, cost)
             # print(nodes_cost[id])
 
+        if id == '36':
+            caminho = []
+
+            while id != str(first.id):
+                # print(nodes_cost[id])
+                caminho.append((id, nodes_cost[id][0], nodes_cost[id][1]))
+                print(caminho)
+                # print('id 1 = ' + id)
+                id = str(nodes_cost[id][0])
+                # print('id 2 = ' + id)
+            
+            print(caminho)
+            break
+
+
+            # print(nodes_cost)
+            # print(nodes_cost[id])
+
+            # for i in nodes_cost:
+            #     print(i)
+            break
+
+        # busca o nó que corresponde ao to_verify
+        # id, (origin, cost)
         node = [x for x in graph if (x.id == to_verify[2])][0]
         node.visited = True
+
+        if node.id == 36:
+            print(node.cost)
         # print('####')
+        # print(node.id)
+        # print(node.cost)
+        # print(node.lowest_cost)
         # print(nodes_cost[id][0])
+        # print(nodes_cost[id][1])
+        # print(id)
         node_cost = nodes_cost[id][1]
         for i in node.neighbors:
-            cost = node_cost + i.cost
+            if i.cost == 'x':
+                cost = node_cost
+            else:
+                cost = node_cost + i.cost
             if not i.visited:
                 # print('entrous')
                 heapq.heappush(to_visit, (cost, node.id, i.id))
-        # print('aqui ' + str(node))
-        # print(node.id)
-        # print(to_verify[2])
-        # print('#####')
             
 
     # for i in first.neighbors:
@@ -179,7 +216,7 @@ def create_map():
     id = 1
     for i in range(0, 1067, 212):
         # print(i)
-        for j in range(593, 0, -98):
+        for j in range(0, 593, 98):
             # print(j)
             aux = Map(id, i, i+211, j, j+97)
             id += 1
