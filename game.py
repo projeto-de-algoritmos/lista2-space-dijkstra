@@ -15,6 +15,7 @@ white = (255,255,255)
 red = (255,0,0)
 
 gameDisplay = pygame.display.set_mode((1277, 689))
+# solutionDisplay = pygame.display.set_mode((1277, 689))
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((1277, 689))
@@ -55,7 +56,10 @@ class Map:
             self.cost = 'x' # posicao final
         if(pos_x_ini == 0 and pos_y_ini == 588):
             self.cost = 0 # posicao inicial
-        self.has_ipiranga = randint(0, 2)
+        if self.id == 7:
+            self.has_ipiranga = 0
+        else:
+            self.has_ipiranga = randint(0, 2)
         self.neighbors = []
         self.visited = False
 
@@ -76,9 +80,9 @@ def dijsktra(graph):
     nodes_cost = defaultdict(list)
     to_visit = []
 
-    """
+    '''
     procura o nó com custo zero, posição inical da nave
-    """
+    '''
     for i in graph:
         if i.cost == 0:
             first = i
@@ -86,80 +90,58 @@ def dijsktra(graph):
 
     first.visited = True
     
+    '''
+    coloca os 2 primeiros vizinhos no heap
+    '''
     for i in first.neighbors:
         if i.has_ipiranga == 1:
             cost = i.cost - 5
         else:
             cost = i.cost
-        # found = False
-        # for j in to_visit:
-        #     if i.id == j[2] and cost < j[0]:
-        #         j = (cost, first.id, i.id)
-        #         heapq.heapify(to_visit)
-        #         found = True
-        
-        # cost, origin, destin
-        # if not found:
         heapq.heappush(to_visit, (cost, first.id, i.id))
-
     
+    '''
+    enquanto houver nós no heap, prossegue com dijkstra
+    '''
     while to_visit:
-        # count += 1
-        # if count == 200: break
-        # print('###')
         to_verify = heapq.heappop(to_visit)
         id = str(to_verify[2])
         origin = to_verify[1]
         cost = to_verify[0]
 
-        # busca o nó que corresponde ao to_verify
+        '''
+        busca o nó que corresponde ao to_verify
+        '''
         # id, (origin, cost)
         node = [x for x in graph if (x.id == to_verify[2])][0]
         node.visited = True
-        
-        
-        # verifica se existe o peso para chegar no nó e atualiza
+            
+        '''
+        verifica se já existe o peso para chegar no nó e atualiza
+        '''
         if nodes_cost[id]:
-            if  cost < nodes_cost[id][1]:
+            if cost < nodes_cost[id][1]:
                 nodes_cost[id] = (origin, cost)
         else:
             nodes_cost[id] = (origin, cost)
             # print(nodes_cost[id])
 
+        '''
+        verifica se o nó a ser retirado do heap é o destino final
+        '''
         if id == '36':
-            caminho = []
-
+            path = []
             # id, (origin, cost)
             while id != str(first.id):
-                # print(nodes_cost[id])
-                caminho.append((id, nodes_cost[id][0], nodes_cost[id][1]))
-                print(caminho)
-                # print('id 1 = ' + id)
+                path.append((id, nodes_cost[id][0], nodes_cost[id][1]))
+                # print(path)
                 id = str(nodes_cost[id][0])
-                # print('id 2 = ' + id)
-            print('###########################')
-            print (id)
-            caminho.reverse()
-            print(caminho)
-            break
-
-
-            # print(nodes_cost)
-            # print(nodes_cost[id])
-
-            # for i in nodes_cost:
-            #     print(i)
-            # break
-
-        
-
-        # if node.id == 36:
-        #     print(node.cost)
-        # print('####')
+            # print (id)
+            path.reverse()
+            return path
         
         node_cost = nodes_cost[id][1]
         for i in node.neighbors:
-
             if not i.visited:
                 if i.cost == 'x':
                     cost = node_cost
@@ -168,39 +150,18 @@ def dijsktra(graph):
                         cost = node_cost + i.cost - 5
                     else:
                         cost = node_cost + i.cost
-                heapq.heappush(to_visit, (cost, node.id, i.id))
 
-            # if not i.visited:
-                # print('entrous')
-                # não verifica se já existe no heap
-                # heapq.heappush(to_visit, (cost, node.id, i.id))
-
-            
-
-    # for i in first.neighbors:
-        # print(nodes_cost)
-        # print(nodes_cost[str(i.id)])
-
-        # id = str(i.id)
-        # print(id)
-        # print(i.cost)
-        # total_cost = first.lowest_cost + i.cost
-        # if nodes_cost[id]:
-        #     if  total_cost < nodes_cost[id][0][1]:
-        #         nodes_cost[id] = (first.id, total_cost)
-        # else:
-        #     nodes_cost[id] = (first.id, total_cost)
-        #     print(nodes_cost[id])
-        # print("####")
-        
-
-    # first.neighbors[0].lowest_cost = (first.neighbors.id,)
-    
-
-
-    # for i in graph: print(i.id)
-
-    # return visited, path
+                '''
+                verifica se há o vizinho no heap e se precisa atualiza-lo
+                '''
+                found = False
+                for j in to_visit:
+                    if i.id == j[2] and cost < j[0]:
+                        j = (cost, first.id, i.id)
+                        heapq.heapify(to_visit)
+                        found = True
+                if not found:
+                    heapq.heappush(to_visit, (cost, node.id, i.id))
 
 def create_edges(mapa):
     for i in mapa:
@@ -242,6 +203,12 @@ class Game:
     def __init__(self):
         self.map = create_map()
         create_edges(self.map)
+        self.best_path = dijsktra(self.map)
+        while self.best_path[-1][2] < 45 or self.best_path[-1][2] > 50:
+            self.map = create_map()
+            create_edges(self.map)
+            self.best_path = dijsktra(self.map)
+        print('the real game = ' + str(self.best_path))
         # for i in self.map:
         #     print('pai ' + str(i))
         #     for j in i.neighbors:
@@ -255,9 +222,6 @@ class Game:
 
     def run(self):
         shot_list = deque([])
-        dijsktra(self.map)
-        # print(self.map[0])
-        # node = Node(5)
 
         while True:
             if(self.combustivel <= 0):
@@ -312,7 +276,10 @@ class Game:
         elif key[pygame.K_0]:
             self.ativar_postos = True
 
-    
+    # def draw_solution(self):
+    #     pygame.draw.circle(solutionDisplay)
+    #     pass
+
     def draw_costs(self):
         largeText = pygame.font.Font('freesansbold.ttf',25)
         TextSurf, TextRect = text_objects(str(self.combustivel), largeText)
