@@ -1,7 +1,9 @@
 # Space Dijkstra
 
 O Space Dijkstra é um space shooter onde atirar é apenas figurativo, pois o objetivo mesmo é chegar do outro lado do mapa sem que o seu conbustivel acabe.
+
 Para andar em qualquer direção existe um custo de combustivel e se o seu combustivel acabar, bom o jogo acaba. Mas pelo menos existem postos para para abastecer no meio do caminho.
+
 Você pode tentar se aventurar na viagem e tomar suas próprias escolhas, mas se quiser conhecer a melhor escolha é só perguntar para o Dijkstra. Aperte ```s``` e deixe a mágica acontecer
 
 ## Autores
