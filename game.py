@@ -5,20 +5,14 @@ from os.path import abspath, dirname
 from random import choice, randint
 
 
-BASE_PATH = abspath(dirname(__file__))
-FONT_PATH = BASE_PATH + '/fonts/'
-IMAGE_PATH = BASE_PATH + '/images/'
-SOUND_PATH = BASE_PATH + '/sounds/'
 
-# Colors (R, G, B)
-WHITE = (255, 255, 255)
-GREEN = (78, 255, 87)
-YELLOW = (241, 255, 0)
-BLUE = (80, 255, 239)
-PURPLE = (203, 0, 255)
-RED = (237, 28, 36)
+pygame.init()
 
-FONT = FONT_PATH + 'space_invaders.ttf'
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
+
+gameDisplay = pygame.display.set_mode((1277, 689))
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((1277, 689))
@@ -50,6 +44,8 @@ shot = pygame.image.load('images/laser.png')
 #         screen.blit(self.image, (pos_x, pos_y))
 
 
+
+
 class Shot:
     def __init__(self):
         self.image = shot
@@ -77,6 +73,9 @@ class Map:
         self.edges[to_node].append(from_node)
         self.distances[(from_node, to_node)] = distance
 
+    def __str__(self):
+        return str(self.pos_x_ini) + " " + str(self.pos_x_end) + " " + str(self.pos_y_ini) + " " + str(self.pos_y_end) + " " + str(self.coust) + " " + str(self.has_ipiranga)
+
 
 def create_map():
     map = []
@@ -86,11 +85,18 @@ def create_map():
             map.append(aux)
     return map
 
+
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, white)
+    return textSurface, textSurface.get_rect()
+
+
 class Game:
     def __init__(self):
         self.map = create_map()
         for i in self.map:
-            print(i.has_ipiranga)
+            print(i)
         self.pos_x = screen.get_width()/2 # ship horizontal position
         self.pos_y = ship_top
         # self.scoreText = Text(FONT, 20, 'Score', WHITE, 5, 5)
@@ -107,6 +113,9 @@ class Game:
             screen.blit(background, [0, 0])
             # self.scoreText.draw(screen)
             screen.blit(ship, (self.pos_x-ship.get_width()/2, self.pos_y))
+
+            self.draw_cousts()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
@@ -140,6 +149,14 @@ class Game:
             self.pos_y -= 10
         elif key[pygame.K_DOWN] and self.pos_y <= screen.get_height()-ship.get_height():
             self.pos_y += 10
+    
+    def draw_cousts(self):
+        for i in self.map:
+            largeText = pygame.font.Font('freesansbold.ttf',25)
+            TextSurf, TextRect = text_objects(str(i.coust), largeText)
+            TextRect.center = ((i.pos_x_ini+105),(i.pos_y_ini+48))
+            gameDisplay.blit(TextSurf, TextRect)
+
 
 if __name__ == '__main__':
     game = Game()
